@@ -1,0 +1,75 @@
+version: "3"
+
+services:
+
+  authdb:
+    build:
+      context: toolchain/db
+    image: lawliet-guac-authdb
+    container_name: lawliet-guac-authdb
+    env_file:
+      - .env
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    networks:
+      - labnet
+    volumes:
+      - db_vol:/var/lib/mysql:rw
+
+  guacd:
+    image: guacamole/guacd:latest
+    container_name: lawliet-guacd
+    networks:
+      - labnet
+
+  guacamole:
+    build:
+      context: toolchain/guacamole
+    image: lawliet-guacamole:latest
+    container_name: lawliet-guacamole
+    env_file:
+      - .env
+    environment:
+      GUACD_HOSTNAME: guacd
+      GUACD_PORT: 4822
+      MYSQL_HOSTNAME: authdb
+    ports:
+      - "8080:8080"
+    networks:
+      - labnet
+    depends_on:
+      - authdb
+      - guacd
+
+  proxy:
+    build:
+      context: toolchain/proxy
+    image: lawliet-guac-proxy
+    container_name: lawliet-guac-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - labnet
+    depends_on:
+      - guacamole
+
+  lawliet-vnc:
+    build:
+      context: toolchain/vnc
+      args:
+        FROM_IMAGE: "debian:buster-slim"
+    container_name: lawliet-vnc
+    image: lawliet-vnc
+    ports:
+      - "5901:5901"
+    networks:
+      - labnet
+    depends_on:
+      - guacamole
+
+volumes:
+  db_vol:
+
+networks:
+  labnet:
