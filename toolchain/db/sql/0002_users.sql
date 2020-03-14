@@ -60,7 +60,7 @@ SELECT
     (
         SELECT connection_id
         FROM guacamole_connection
-        WHERE connection_name = "test"
+        WHERE connection_name = "vnc-test"
     ) as connection_id,
     "READ"
 FROM guacamole_entity
