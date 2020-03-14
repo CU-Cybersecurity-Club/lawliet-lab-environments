@@ -30,6 +30,7 @@ services:
     env_file:
       - .env
     environment:
+      GUACAMOLE_HOME: "/etc/guacamole"
       GUACD_HOSTNAME: guacd
       GUACD_PORT: 4822
       MYSQL_HOSTNAME: authdb
@@ -54,6 +55,10 @@ services:
     depends_on:
       - guacamole
 
+  ###########################################################
+  ### Services for testing purposes
+  ###########################################################
+
   lawliet-vnc:
     build:
       context: toolchain/vnc
@@ -63,6 +68,18 @@ services:
     image: lawliet-vnc
     ports:
       - "5901:5901"
+    networks:
+      - labnet
+    depends_on:
+      - guacamole
+
+  lawliet-ssh:
+    build:
+      context: base/ssh
+      args:
+        FROM_IMAGE: "debian:buster-slim"
+    container_name: lawliet-ssh
+    image: lawliet-ssh
     networks:
       - labnet
     depends_on:
