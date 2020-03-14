@@ -56,12 +56,12 @@ services:
       - guacamole
 
   ###########################################################
-  ### Services for testing purposes
+  ### Services used for testing purposes
   ###########################################################
 
   lawliet-vnc:
     build:
-      context: toolchain/vnc
+      context: base/vnc
       args:
         FROM_IMAGE: "debian:buster-slim"
     container_name: lawliet-vnc
